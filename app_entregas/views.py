@@ -105,7 +105,7 @@ def minhas_rotas(request):
     rotas = Rota.objects.filter(entregador=entregador).exclude(status='CONCLUIDA').order_by('-data_criacao') if entregador else []
     return render(request, 'app_entregas/minhas_rotas.html', {'rotas': rotas})
 
-# Ação de Coletar / Entregar
+# Ação de Coletar / Entregar (COM A CORREÇÃO DO HISTÓRICO)
 @login_required
 def acao_entrega(request, entrega_id, acao):
     pedido = get_object_or_404(Entrega, id=entrega_id, rota__entregador__usuario=request.user)
@@ -114,18 +114,22 @@ def acao_entrega(request, entrega_id, acao):
         pedido.status = 'COLETADA'
         pedido.rota.status = 'EM_ANDAMENTO'
         pedido.rota.save()
+        pedido.save() # Salva o pedido imediatamente
+        
     elif acao == 'entregar' and pedido.status == 'COLETADA':
         pedido.status = 'ENTREGUE'
+        pedido.save() # <-- SALVA O PEDIDO AQUI PRIMEIRO (Correção!)
+        
+        # Agora que o banco já sabe que esse pedido foi entregue, 
+        # checa se TODOS os pedidos da rota estão entregues
         todos_entregues = all(p.status == 'ENTREGUE' for p in pedido.rota.entrega_set.all())
         if todos_entregues:
             pedido.rota.status = 'CONCLUIDA'
             pedido.rota.save()
             
-    pedido.save()
     return redirect('minhas_rotas')
 
-# --- NOVAS TELAS DE HISTÓRICO ---
-
+# Histórico da Loja (RF 014)
 @login_required
 def historico_loja(request):
     try:
@@ -135,6 +139,7 @@ def historico_loja(request):
         entregas_concluidas = []
     return render(request, 'app_entregas/historico_loja.html', {'entregas': entregas_concluidas})
 
+# Histórico do Entregador (RF 015)
 @login_required
 def historico_entregador(request):
     entregador = Entregador.objects.filter(usuario=request.user).first()

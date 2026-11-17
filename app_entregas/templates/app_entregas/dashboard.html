@@ -2,52 +2,50 @@
 
 {% block content %}
     <h2>Bem-vindo ao Painel!</h2>
-    <p>Olá, {{ user.username }}! O que você deseja fazer hoje?</p>
+    <p style="text-align: center; margin-bottom: 30px;">Olá, {{ user.username }}! O que você deseja fazer hoje?</p>
     
-    <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 15px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
         
         <!-- ÁREA DA LOJA -->
         {% if is_loja %}
             <a href="{% url 'cadastrar_pedido' %}" style="text-decoration: none;">
-                <button style="background-color: #3498db;">+ Cadastrar Novo Pedido de Entrega</button>
+                <button style="background-color: #3498db; height: 100px;">+ Novo Pedido</button>
             </a>
             <a href="{% url 'listar_pedidos' %}" style="text-decoration: none;">
-                <button style="background-color: #f39c12;">Ver Meus Pedidos</button>
+                <button style="background-color: #f39c12; height: 100px;">Meus Pedidos</button>
             </a>
             <a href="{% url 'historico_loja' %}" style="text-decoration: none;">
-                <button style="background-color: #7f8c8d;">Histórico de Entregas</button>
+                <button style="background-color: #7f8c8d; height: 100px;">Histórico</button>
             </a>
         {% endif %}
 
         <!-- ÁREA DO ENTREGADOR -->
         {% if is_entregador %}
             <a href="{% url 'listar_rotas' %}" style="text-decoration: none;">
-                <button style="background-color: #e74c3c;">Buscar Rotas Disponíveis</button>
+                <button style="background-color: #e74c3c; height: 100px;">Buscar Rotas</button>
             </a>
             <a href="{% url 'minhas_rotas' %}" style="text-decoration: none;">
-                <button style="background-color: #2c3e50;">Minhas Entregas Ativas</button>
+                <button style="background-color: #2c3e50; height: 100px;">Minhas Entregas</button>
             </a>
             <a href="{% url 'historico_entregador' %}" style="text-decoration: none;">
-                <button style="background-color: #7f8c8d;">Histórico de Rotas</button>
+                <button style="background-color: #7f8c8d; height: 100px;">Histórico</button>
             </a>
         {% endif %}
 
         <!-- Se a pessoa não tiver perfil ainda -->
         {% if not is_loja and not is_entregador %}
-            <div style="background-color: #f8d7da; padding: 15px; border-radius: 5px; border: 1px solid #f5c6cb;">
-                <p style="color: #721c24; margin-top: 0;">Você ainda não tem um perfil configurado.</p>
-                <p style="color: #721c24;">Para ser <strong>Loja</strong>, cadastre um pedido.<br>
-                Para ser <strong>Entregador</strong>, aceite uma rota disponível.</p>
-                
+            <div style="background-color: #f8d7da; padding: 15px; border-radius: 5px; border: 1px solid #f5c6cb; grid-column: 1 / -1; text-align: center;">
+                <p style="color: #721c24; margin-bottom: 10px;">Você ainda não tem um perfil configurado.</p>
                 <a href="{% url 'listar_rotas' %}" style="text-decoration: none;">
-                    <button style="background-color: #e74c3c; width: 100%;">Aceitar minha primeira rota</button>
+                    <button style="background-color: #e74c3c; width: 50%;">Aceitar minha primeira rota</button>
                 </a>
             </div>
         {% endif %}
+    </div>
 
-        <!-- Botão de Reset para Testes -->
-        <a href="{% url 'resetar_teste' %}" style="text-decoration: none; margin-top: 20px;">
-            <button style="background-color: #555; font-size: 12px;">🔄 Resetar Banco de Testes</button>
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{% url 'resetar_teste' %}" style="text-decoration: none;">
+            <button style="background-color: #555; font-size: 12px; width: auto; padding: 8px 15px;">🔄 Resetar Banco de Testes</button>
         </a>
     </div>
 {% endblock %}

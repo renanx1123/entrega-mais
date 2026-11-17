@@ -3,37 +3,55 @@
 {% block content %}
     <h2>Meus Pedidos</h2>
     
-    <div style="margin-top: 20px; margin-bottom: 20px;">
-        <a href="{% url 'criar_rota' %}" style="text-decoration: none;">
-            <button style="background-color: #2ecc71;">Agrupar TODOS os Pendentes em Rota</button>
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <a href="{% url 'criar_rota' %}" style="text-decoration: none; flex: 1;">
+            <button style="background-color: #2ecc71;">Agrupar Todos em Rota</button>
+        </a>
+        <a href="{% url 'cadastrar_pedido' %}" style="text-decoration: none; flex: 1;">
+            <button style="background-color: #3498db;">+ Novo Pedido</button>
         </a>
     </div>
 
-    <div>
-        {% if pedidos %}
-            <ul style="list-style: none; padding: 0;">
-            {% for pedido in pedidos %}
-                <li style="background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px;">
-                    <strong>Destinatário:</strong> {{ pedido.destinatario }}<br>
-                    <strong>Endereço:</strong> {{ pedido.endereco_destino }}<br>
-                    <strong>Status:</strong> <span style="color: #f39c12; font-weight: bold;">{{ pedido.get_status_display }}</span><br>
-                    <small style="color: #888;">Solicitado em: {{ pedido.data_solicitacao|date:"d/m/Y H:i" }}</small>
-                    
-                    <!-- Se o pedido estiver pendente, mostra o botão individual -->
-                    {% if pedido.status == 'PENDENTE_ROTA' %}
-                        <div style="margin-top: 10px;">
-                            <a href="{% url 'criar_rota_individual' pedido.id %}" style="display: inline-block; background-color: #3498db; color: white; padding: 8px; border-radius: 4px; text-decoration: none; font-size: 14px;">
-                                Enviar Sozinho (Rota Única)
-                            </a>
-                        </div>
-                    {% endif %}
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>Você ainda não tem nenhum pedido cadastrado.</p>
-        {% endif %}
-    </div>
+    {% if pedidos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Destinatário</th>
+                    <th>Endereço</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pedido in pedidos %}
+                    <tr>
+                        <td><strong>{{ pedido.destinatario }}</strong></td>
+                        <td>{{ pedido.endereco_destino }}</td>
+                        <td>
+                            {% if pedido.status == 'PENDENTE_ROTA' %}
+                                <span class="badge bg-warning">Pendente</span>
+                            {% elif pedido.status == 'DISPONIVEL' %}
+                                <span class="badge bg-info">Disponível</span>
+                            {% elif pedido.status == 'ENTREGUE' %}
+                                <span class="badge bg-success">Entregue</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ pedido.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if pedido.status == 'PENDENTE_ROTA' %}
+                                <a href="{% url 'criar_rota_individual' pedido.id %}" style="color: #3498db; text-decoration: none; font-weight: bold;">Enviar Sozinho</a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="text-align: center; color: #888;">Você ainda não tem nenhum pedido cadastrado.</p>
+    {% endif %}
 
-    <a href="{% url 'dashboard' %}" class="link" style="margin-top: 20px; display: block;">Voltar para o Painel</a>
+    <a href="{% url 'dashboard' %}" class="link">Voltar para o Painel</a>
 {% endblock %}
