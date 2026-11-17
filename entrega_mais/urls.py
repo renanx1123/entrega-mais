@@ -6,7 +6,8 @@ from app_entregas.views import (
     SignUpView, dashboard, cadastrar_pedido, listar_pedidos,
     criar_rota, criar_rota_individual, listar_rotas,
     aceitar_rota, minhas_rotas, acao_entrega, resetar_teste,
-    historico_loja, historico_entregador
+    historico_loja, historico_entregador, cancelar_pedido,
+    alternar_disponibilidade # <-- Novo import
 )
 
 urlpatterns = [
@@ -21,6 +22,7 @@ urlpatterns = [
     # Loja
     path('pedido/novo/', cadastrar_pedido, name='cadastrar_pedido'),
     path('meus-pedidos/', listar_pedidos, name='listar_pedidos'),
+    path('pedido/cancelar/<int:entrega_id>/', cancelar_pedido, name='cancelar_pedido'),
     path('rotas/criar/', criar_rota, name='criar_rota'),
     path('rotas/criar/<int:entrega_id>/', criar_rota_individual, name='criar_rota_individual'),
     
@@ -29,6 +31,7 @@ urlpatterns = [
     path('rotas/aceitar/<int:rota_id>/', aceitar_rota, name='aceitar_rota'),
     path('minhas-rotas/', minhas_rotas, name='minhas_rotas'),
     path('entrega/<int:entrega_id>/<str:acao>/', acao_entrega, name='acao_entrega'),
+    path('entregador/disponibilidade/', alternar_disponibilidade, name='alternar_disponibilidade'), # <-- Nova rota
     
     # Históricos
     path('historico-loja/', historico_loja, name='historico_loja'),

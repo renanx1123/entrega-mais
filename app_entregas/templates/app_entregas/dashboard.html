@@ -4,6 +4,24 @@
     <h2>Bem-vindo ao Painel!</h2>
     <p style="text-align: center; margin-bottom: 30px;">Olá, {{ user.username }}! O que você deseja fazer hoje?</p>
     
+    <!-- ÁREA DO ENTREGADOR (Status de Disponibilidade) -->
+    {% if is_entregador %}
+        <div style="background: #ecf0f1; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+            <p style="margin-bottom: 10px;">Seu status atual: 
+                {% if user.entregador.disponivel %}
+                    <strong style="color: #2ecc71;">DISPONÍVEL</strong>
+                {% else %}
+                    <strong style="color: #e74c3c;">INDISPONÍVEL (ou em rota)</strong>
+                {% endif %}
+            </p>
+            <a href="{% url 'alternar_disponibilidade' %}" style="text-decoration: none;">
+                <button style="background-color: {% if user.entregador.disponivel %}#7f8c8d{% else %}#2ecc71{% endif %}; width: auto; padding: 8px 20px; font-size: 14px;">
+                    Mudar para {% if user.entregador.disponivel %}Indisponível{% else %}Disponível{% endif %}
+                </button>
+            </a>
+        </div>
+    {% endif %}
+
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
         
         <!-- ÁREA DA LOJA -->

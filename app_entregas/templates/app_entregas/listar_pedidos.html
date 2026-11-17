@@ -19,6 +19,7 @@
                     <th>Destinatário</th>
                     <th>Endereço</th>
                     <th>Status</th>
+                    <th>Entregador</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -34,14 +35,29 @@
                                 <span class="badge bg-info">Disponível</span>
                             {% elif pedido.status == 'ENTREGUE' %}
                                 <span class="badge bg-success">Entregue</span>
+                            {% elif pedido.status == 'CANCELADA' %}
+                                <span class="badge bg-danger" style="background-color: #7f8c8d;">Cancelada</span>
                             {% else %}
                                 <span class="badge bg-danger">{{ pedido.get_status_display }}</span>
                             {% endif %}
                         </td>
                         <td>
-                            {% if pedido.status == 'PENDENTE_ROTA' %}
-                                <a href="{% url 'criar_rota_individual' pedido.id %}" style="color: #3498db; text-decoration: none; font-weight: bold;">Enviar Sozinho</a>
+                            {% if pedido.rota.entregador %}
+                                {{ pedido.rota.entregador.usuario.username }}
                             {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if pedido.status == 'PENDENTE_ROTA' %}
+                                <a href="{% url 'criar_rota_individual' pedido.id %}" style="color: #3498db; text-decoration: none; font-weight: bold; margin-right: 10px;">Enviar Sozinho</a>
+                            {% endif %}
+                            
+                            {% if pedido.status == 'PENDENTE_ROTA' or pedido.status == 'DISPONIVEL' %}
+                                <a href="{% url 'cancelar_pedido' pedido.id %}" style="color: #e74c3c; text-decoration: none; font-weight: bold;" onclick="return confirm('Tem certeza que deseja cancelar este pedido?');">Cancelar</a>
+                            {% endif %}
+                            
+                            {% if pedido.status != 'PENDENTE_ROTA' and pedido.status != 'DISPONIVEL' %}
                                 -
                             {% endif %}
                         </td>
