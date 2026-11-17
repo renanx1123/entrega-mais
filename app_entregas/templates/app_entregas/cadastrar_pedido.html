@@ -1,0 +1,13 @@
+{% extends 'app_entregas/base.html' %}
+
+{% block content %}
+    <h2>Novo Pedido de Entrega</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" style="margin-top: 15px;">Salvar Pedido</button>
+    </form>
+
+    <a href="{% url 'dashboard' %}" class="link">Voltar para o Painel</a>
+{% endblock %}

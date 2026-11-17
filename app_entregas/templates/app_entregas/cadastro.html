@@ -1,0 +1,13 @@
+{% extends 'app_entregas/base.html' %}
+
+{% block content %}
+    <h2>Crie sua conta</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <a href="{% url 'login' %}" class="link">Já tem uma conta? Faça login</a>
+{% endblock %}

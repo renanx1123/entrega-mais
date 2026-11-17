@@ -1,0 +1,39 @@
+{% extends 'app_entregas/base.html' %}
+
+{% block content %}
+    <h2>Minhas Rotas (Entregador)</h2>
+    
+    <div style="margin-top: 20px;">
+        {% if rotas %}
+            {% for rota in rotas %}
+                <div style="background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                    <h3>Rota #{{ rota.id }} - Status: {{ rota.get_status_display }}</h3>
+                    <p><strong>Loja:</strong> {{ rota.loja.nome_fantasia }}</p>
+                    
+                    <ul style="list-style: none; padding: 0;">
+                        {% for entrega in rota.entrega_set.all %}
+                            <li style="border-top: 1px dashed #ccc; padding: 10px 0;">
+                                <strong>Destinatário:</strong> {{ entrega.destinatario }}<br>
+                                <strong>Endereço:</strong> {{ entrega.endereco_destino }}<br>
+                                <strong>Status:</strong> <span style="color: #e74c3c;">{{ entrega.get_status_display }}</span><br>
+                                
+                                <!-- Botões de Ação baseados no status da entrega -->
+                                {% if entrega.status == 'ACEITA' %}
+                                    <a href="{% url 'acao_entrega' entrega.id 'coletar' %}" style="display: inline-block; background-color: #f39c12; color: white; padding: 8px; border-radius: 4px; text-decoration: none; margin-top: 10px;">Confirmar Coleta</a>
+                                {% elif entrega.status == 'COLETADA' %}
+                                    <a href="{% url 'acao_entrega' entrega.id 'entregar' %}" style="display: inline-block; background-color: #2ecc71; color: white; padding: 8px; border-radius: 4px; text-decoration: none; margin-top: 10px;">Confirmar Entrega</a>
+                                {% elif entrega.status == 'ENTREGUE' %}
+                                    <span style="color: green; font-weight: bold; display: block; margin-top: 10px;">✔ Entregue</span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Você não tem rotas ativas no momento.</p>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'dashboard' %}" class="link" style="margin-top: 20px; display: block;">Voltar para o Painel</a>
+{% endblock %}

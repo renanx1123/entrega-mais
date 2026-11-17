@@ -1,0 +1,39 @@
+{% extends 'app_entregas/base.html' %}
+
+{% block content %}
+    <h2>Meus Pedidos</h2>
+    
+    <div style="margin-top: 20px; margin-bottom: 20px;">
+        <a href="{% url 'criar_rota' %}" style="text-decoration: none;">
+            <button style="background-color: #2ecc71;">Agrupar TODOS os Pendentes em Rota</button>
+        </a>
+    </div>
+
+    <div>
+        {% if pedidos %}
+            <ul style="list-style: none; padding: 0;">
+            {% for pedido in pedidos %}
+                <li style="background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px;">
+                    <strong>Destinatário:</strong> {{ pedido.destinatario }}<br>
+                    <strong>Endereço:</strong> {{ pedido.endereco_destino }}<br>
+                    <strong>Status:</strong> <span style="color: #f39c12; font-weight: bold;">{{ pedido.get_status_display }}</span><br>
+                    <small style="color: #888;">Solicitado em: {{ pedido.data_solicitacao|date:"d/m/Y H:i" }}</small>
+                    
+                    <!-- Se o pedido estiver pendente, mostra o botão individual -->
+                    {% if pedido.status == 'PENDENTE_ROTA' %}
+                        <div style="margin-top: 10px;">
+                            <a href="{% url 'criar_rota_individual' pedido.id %}" style="display: inline-block; background-color: #3498db; color: white; padding: 8px; border-radius: 4px; text-decoration: none; font-size: 14px;">
+                                Enviar Sozinho (Rota Única)
+                            </a>
+                        </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>Você ainda não tem nenhum pedido cadastrado.</p>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'dashboard' %}" class="link" style="margin-top: 20px; display: block;">Voltar para o Painel</a>
+{% endblock %}
