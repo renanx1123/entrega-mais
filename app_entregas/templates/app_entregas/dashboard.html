@@ -14,9 +14,12 @@
             <a href="{% url 'listar_pedidos' %}" style="text-decoration: none;">
                 <button style="background-color: #f39c12;">Ver Meus Pedidos</button>
             </a>
+            <a href="{% url 'historico_loja' %}" style="text-decoration: none;">
+                <button style="background-color: #7f8c8d;">Histórico de Entregas</button>
+            </a>
         {% endif %}
 
-             <!-- ÁREA DO ENTREGADOR -->
+        <!-- ÁREA DO ENTREGADOR -->
         {% if is_entregador %}
             <a href="{% url 'listar_rotas' %}" style="text-decoration: none;">
                 <button style="background-color: #e74c3c;">Buscar Rotas Disponíveis</button>
@@ -24,8 +27,12 @@
             <a href="{% url 'minhas_rotas' %}" style="text-decoration: none;">
                 <button style="background-color: #2c3e50;">Minhas Entregas Ativas</button>
             </a>
+            <a href="{% url 'historico_entregador' %}" style="text-decoration: none;">
+                <button style="background-color: #7f8c8d;">Histórico de Rotas</button>
+            </a>
         {% endif %}
-              <!-- Se a pessoa não tiver perfil ainda (usuário novo) -->
+
+        <!-- Se a pessoa não tiver perfil ainda -->
         {% if not is_loja and not is_entregador %}
             <div style="background-color: #f8d7da; padding: 15px; border-radius: 5px; border: 1px solid #f5c6cb;">
                 <p style="color: #721c24; margin-top: 0;">Você ainda não tem um perfil configurado.</p>
@@ -37,7 +44,8 @@
                 </a>
             </div>
         {% endif %}
-        <!-- Botão de Reset para Testes (sempre visível por enquanto) -->
+
+        <!-- Botão de Reset para Testes -->
         <a href="{% url 'resetar_teste' %}" style="text-decoration: none; margin-top: 20px;">
             <button style="background-color: #555; font-size: 12px;">🔄 Resetar Banco de Testes</button>
         </a>

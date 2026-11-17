@@ -1,0 +1,19 @@
+{% extends 'app_entregas/base.html' %}
+{% block content %}
+    <h2>Histórico de Entregas (Loja)</h2>
+    <div style="margin-top: 20px;">
+        {% if entregas %}
+            {% for entrega in entregas %}
+                <div style="background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px;">
+                    <strong>Destinatário:</strong> {{ entrega.destinatario }}<br>
+                    <strong>Endereço:</strong> {{ entrega.endereco_destino }}<br>
+                    <strong>Status:</strong> <span style="color: #2ecc71; font-weight: bold;">{{ entrega.get_status_display }}</span><br>
+                    <small style="color: #888;">Data: {{ entrega.data_solicitacao|date:"d/m/Y H:i" }}</small>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Nenhuma entrega concluída no momento.</p>
+        {% endif %}
+    </div>
+    <a href="{% url 'dashboard' %}" class="link" style="margin-top: 20px; display: block;">Voltar para o Painel</a>
+{% endblock %}

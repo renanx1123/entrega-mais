@@ -1,0 +1,18 @@
+{% extends 'app_entregas/base.html' %}
+{% block content %}
+    <h2>Histórico de Rotas (Entregador)</h2>
+    <div style="margin-top: 20px;">
+        {% if rotas %}
+            {% for rota in rotas %}
+                <div style="background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px;">
+                    <strong>Rota #{{ rota.id }}</strong> - <span style="color: #2ecc71; font-weight: bold;">Concluída</span><br>
+                    <strong>Loja:</strong> {{ rota.loja.nome_fantasia }}<br>
+                    <small style="color: #888;">Data: {{ rota.data_criacao|date:"d/m/Y H:i" }}</small>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Nenhuma rota concluída no momento.</p>
+        {% endif %}
+    </div>
+    <a href="{% url 'dashboard' %}" class="link" style="margin-top: 20px; display: block;">Voltar para o Painel</a>
+{% endblock %}
