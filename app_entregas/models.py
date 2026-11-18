@@ -7,7 +7,7 @@ class StatusEntrega(models.TextChoices):
     ACEITA = 'ACEITA', 'Aceita'
     COLETADA = 'COLETADA', 'Coletada'
     ENTREGUE = 'ENTREGUE', 'Entregue'
-    CANCELADA = 'CANCELADA', 'Cancelada' # <-- Já estava aí, mas precisamos usar
+    CANCELADA = 'CANCELADA', 'Cancelada' 
 
 class StatusRota(models.TextChoices):
     EM_MONTAGEM = 'EM_MONTAGEM', 'Em Montagem'
@@ -27,8 +27,7 @@ class Loja(models.Model):
 class Entregador(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     veiculo = models.CharField(max_length=50)
-    disponivel = models.BooleanField(default=True) # Mudei para True por padrão para facilitar testes
-    
+    disponivel = models.BooleanField(default=True) 
     def __str__(self):
         return self.usuario.get_full_name() or self.usuario.username
 
@@ -37,7 +36,7 @@ class Rota(models.Model):
     entregador = models.ForeignKey(Entregador, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=20, choices=StatusRota.choices, default=StatusRota.EM_MONTAGEM)
     data_criacao = models.DateTimeField(auto_now_add=True)
-    data_aceite = models.DateTimeField(null=True, blank=True) # <-- NOVO: Data do aceite
+    data_aceite = models.DateTimeField(null=True, blank=True) 
     
     def __str__(self):
         return f"Rota #{self.id} - {self.loja.nome_fantasia}"
@@ -50,7 +49,7 @@ class Entrega(models.Model):
     telefone = models.CharField(max_length=20, blank=True, null=True)
     status = models.CharField(max_length=20, choices=StatusEntrega.choices, default=StatusEntrega.PENDENTE_ROTA)
     
-    # NOVOS CAMPOS DE DATAS EXIGIDOS PELO PDF
+
     data_solicitacao = models.DateTimeField(auto_now_add=True)
     data_coleta = models.DateTimeField(null=True, blank=True)
     data_entrega = models.DateTimeField(null=True, blank=True)

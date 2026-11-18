@@ -6,18 +6,14 @@ from pathlib import Path
 import os
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-)0atn(+qv#2bb-621dd%&0g(9k+tyzgyf3dqhnyb#h1+%h(@m_'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -60,7 +56,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'entrega_mais.wsgi.application'
 
 # Database
-# Configurado para usar SQLite no seu PC e PostgreSQL no Render automaticamente
+# Configurado para usar SQLite no seu PC e PostgreSQL no Render 
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
@@ -68,7 +64,7 @@ DATABASES = {
     )
 }
 
-# Password validation
+# Password validação
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -84,18 +80,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
+#Internationalization
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Campo_Grande'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # <-- ADICIONADO
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' # <-- ADICIONADO
 
-# Email
+#Email
 MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
@@ -104,7 +99,7 @@ MAILERS = {
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 
-# Configurações de Segurança para Deploy
+#Configurações de Segurança para Deploy
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:8000",

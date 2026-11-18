@@ -7,20 +7,20 @@ from django.utils import timezone
 from .forms import EntregaForm
 from .models import Loja, Entrega, Rota, Entregador
 
-# Tela de Cadastro de Usuário
+#Tela de Cadastro de Usuário
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'app_entregas/cadastro.html'
 
-# Tela do Painel (Dashboard)
+#Tela do Painel Dashboard
 @login_required
 def dashboard(request):
     is_loja = Loja.objects.filter(usuario=request.user).exists()
     is_entregador = Entregador.objects.filter(usuario=request.user).exists()
     return render(request, 'app_entregas/dashboard.html', {'is_loja': is_loja, 'is_entregador': is_entregador})
 
-# Tela de Cadastrar Pedido
+#Tela de Cadastrar Pedido
 @login_required
 def cadastrar_pedido(request):
     if request.method == 'POST':
@@ -38,7 +38,7 @@ def cadastrar_pedido(request):
         form = EntregaForm()
     return render(request, 'app_entregas/cadastrar_pedido.html', {'form': form})
 
-# Tela de Listar Pedidos (Visão da Loja)
+#tela de Listar Pedidos 
 @login_required
 def listar_pedidos(request):
     try:
@@ -48,7 +48,7 @@ def listar_pedidos(request):
         pedidos = []
     return render(request, 'app_entregas/listar_pedidos.html', {'pedidos': pedidos})
 
-# Ação de Cancelar Pedido (RF 013)
+#Ação de Cancelar Pedido
 @login_required
 def cancelar_pedido(request, entrega_id):
     pedido = get_object_or_404(Entrega, id=entrega_id, loja__usuario=request.user)
@@ -70,7 +70,7 @@ def cancelar_pedido(request, entrega_id):
             
     return redirect('listar_pedidos')
 
-# Ação de Criar Rota Agrupada (Botão Verde)
+#Ação de Criar Rota Agrupada
 @login_required
 def criar_rota(request):
     try:
@@ -87,7 +87,7 @@ def criar_rota(request):
             pedido.save()
     return redirect('listar_pedidos')
 
-# Ação de Criar Rota Individual (Botão Azul)
+#Ação de Criar Rota Individual 
 @login_required
 def criar_rota_individual(request, entrega_id):
     pedido = get_object_or_404(Entrega, id=entrega_id, loja__usuario=request.user)
@@ -98,13 +98,13 @@ def criar_rota_individual(request, entrega_id):
         pedido.save()
     return redirect('listar_pedidos')
 
-# Tela de Rotas Disponíveis (Visão do Entregador)
+#Tela de Rotas Disponíveis
 @login_required
 def listar_rotas(request):
     rotas = Rota.objects.filter(status='DISPONIVEL')
     return render(request, 'app_entregas/rotas_disponiveis.html', {'rotas': rotas})
 
-# Ação de Aceitar Rota (Com Bloqueio de Rota Dupla e Disponibilidade - RN 010 e RF 009)
+#Ação de Aceitar Rota
 @login_required
 def aceitar_rota(request, rota_id):
     rota = get_object_or_404(Rota, id=rota_id)
@@ -123,7 +123,6 @@ def aceitar_rota(request, rota_id):
         rota.status = 'ACEITA'
         rota.data_aceite = timezone.now()
         rota.save()
-        
         # O entregador fica indisponível ao aceitar uma rota
         entregador.disponivel = False
         entregador.save()
@@ -134,14 +133,14 @@ def aceitar_rota(request, rota_id):
             
     return redirect('listar_rotas')
 
-# Tela de Minhas Rotas Ativas (Visão do Entregador)
+#Tela de Minhas Rotas Ativas
 @login_required
 def minhas_rotas(request):
     entregador = Entregador.objects.filter(usuario=request.user).first()
     rotas = Rota.objects.filter(entregador=entregador).exclude(status='CONCLUIDA').order_by('-data_criacao') if entregador else []
     return render(request, 'app_entregas/minhas_rotas.html', {'rotas': rotas})
 
-# Ação de Coletar / Entregar (Com Gravação de Datas)
+#Ação de Coletar 
 @login_required
 def acao_entrega(request, entrega_id, acao):
     pedido = get_object_or_404(Entrega, id=entrega_id, rota__entregador__usuario=request.user)
@@ -163,8 +162,7 @@ def acao_entrega(request, entrega_id, acao):
         if todos_entregues:
             pedido.rota.status = 'CONCLUIDA'
             pedido.rota.save()
-            
-            # Libera o entregador para novas rotas
+             # Libera o entregador para novas rotas
             entregador = pedido.rota.entregador
             if entregador:
                 entregador.disponivel = True
@@ -172,7 +170,7 @@ def acao_entrega(request, entrega_id, acao):
             
     return redirect('minhas_rotas')
 
-# Ação de Alternar Disponibilidade (RF 009)
+#Ação de Alternar Disponibilidade
 @login_required
 def alternar_disponibilidade(request):
     entregador = Entregador.objects.filter(usuario=request.user).first()
@@ -184,7 +182,7 @@ def alternar_disponibilidade(request):
             entregador.save()
     return redirect('dashboard')
 
-# Histórico da Loja (RF 014)
+#Histórico da Loja
 @login_required
 def historico_loja(request):
     try:
@@ -194,7 +192,7 @@ def historico_loja(request):
         entregas_concluidas = []
     return render(request, 'app_entregas/historico_loja.html', {'entregas': entregas_concluidas})
 
-# Histórico do Entregador (RF 015)
+#Histórico do Entregador
 @login_required
 def historico_entregador(request):
     entregador = Entregador.objects.filter(usuario=request.user).first()
@@ -203,10 +201,3 @@ def historico_entregador(request):
     else:
         rotas_concluidas = []
     return render(request, 'app_entregas/historico_entregador.html', {'rotas': rotas_concluidas})
-
-# Botão Mágico de Reset para Testes
-@login_required
-def resetar_teste(request):
-    Entrega.objects.all().update(rota=None, status='PENDENTE_ROTA', data_coleta=None, data_entrega=None, data_cancelamento=None)
-    Rota.objects.all().delete()
-    return redirect('dashboard')
