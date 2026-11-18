@@ -201,3 +201,9 @@ def historico_entregador(request):
     else:
         rotas_concluidas = []
     return render(request, 'app_entregas/historico_entregador.html', {'rotas': rotas_concluidas})
+# Botão de Reset para Testes
+@login_required
+def resetar_teste(request):
+    Entrega.objects.all().update(rota=None, status='PENDENTE_ROTA', data_coleta=None, data_entrega=None, data_cancelamento=None)
+    Rota.objects.all().delete()
+    return redirect('dashboard')
