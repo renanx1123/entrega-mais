@@ -3,15 +3,19 @@
 {% block content %}
     <h2>Meus Pedidos</h2>
     
+    <!-- BOTÕES DE AÇÃO rapida                      -->
     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <!--Cria uma rota agrupando todos os pedidos pendentes-->
         <a href="{% url 'criar_rota' %}" style="text-decoration: none; flex: 1;">
             <button style="background-color: #2ecc71;">Agrupar Todos em Rota</button>
         </a>
+        <!-- Redireciona para a tela de cadastrar um novo pedido-->
         <a href="{% url 'cadastrar_pedido' %}" style="text-decoration: none; flex: 1;">
             <button style="background-color: #3498db;">+ Novo Pedido</button>
         </a>
     </div>
 
+    <!--Verifica se a loja tem algum pedido para mostrar a tabela -->
     {% if pedidos %}
         <table>
             <thead>
@@ -24,10 +28,14 @@
                 </tr>
             </thead>
             <tbody>
+                <!--Loop é para criar uma linha para cada pedido do banco -->
                 {% for pedido in pedidos %}
                     <tr>
                         <td><strong>{{ pedido.destinatario }}</strong></td>
                         <td>{{ pedido.endereco_destino }}</td>
+                        
+                        <!-- RENDERIZAÇÃO DOS STATUS-->
+                        <!-- Dependendo do status aplica uma cor diferente badge embelezando o site -->
                         <td>
                             {% if pedido.status == 'PENDENTE_ROTA' %}
                                 <span class="badge bg-warning">Pendente</span>
@@ -41,6 +49,9 @@
                                 <span class="badge bg-danger">{{ pedido.get_status_display }}</span>
                             {% endif %}
                         </td>
+
+                        <!-- EXIBIÇÃO DO ENTREGADOR  -->
+                        <!-- Acessa o relacionamento reverso (Pedido -> Rota -> Entregador) -->
                         <td>
                             {% if pedido.rota.entregador %}
                                 {{ pedido.rota.entregador.usuario.username }}
@@ -48,15 +59,23 @@
                                 -
                             {% endif %}
                         </td>
+
+                        <!-- BOTÕES DE AÇÃO da linha -->
                         <td>
+                            <!-- Só permite enviar sozinho se o pedido ainda não estiver
+                              em rota -->
                             {% if pedido.status == 'PENDENTE_ROTA' %}
-                                <a href="{% url 'criar_rota_individual' pedido.id %}" style="color: #3498db; text-decoration: none; font-weight: bold; margin-right: 10px;">Enviar Sozinho</a>
+                                <a href="{% url 'criar_rota_individual' pedido.id %}" 
+                                style="color: #3498db; text-decoration: none; font-weight: bold; margin-right: 10px;">Enviar Sozinho</a>
                             {% endif %}
                             
+                            <!--o botão Cancelar SÓ APARECE se a rota não foi aceita ainda -->
                             {% if pedido.status == 'PENDENTE_ROTA' or pedido.status == 'DISPONIVEL' %}
+                                <!-- O JS onclick pede uma confirmação antes de cancelar -->
                                 <a href="{% url 'cancelar_pedido' pedido.id %}" style="color: #e74c3c; text-decoration: none; font-weight: bold;" onclick="return confirm('Tem certeza que deseja cancelar este pedido?');">Cancelar</a>
                             {% endif %}
                             
+                            <!-- Se o status for outro Aceita, Coletada, Entregue, mostra apenas um traço -->
                             {% if pedido.status != 'PENDENTE_ROTA' and pedido.status != 'DISPONIVEL' %}
                                 -
                             {% endif %}

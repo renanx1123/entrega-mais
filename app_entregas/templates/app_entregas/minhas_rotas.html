@@ -4,24 +4,35 @@
     <h2>Minhas Rotas (Entregador)</h2>
     
     <div style="margin-top: 20px;">
+        <!--Verifica se o entregador tem rotas ativas que não foram concluídas-->
         {% if rotas %}
             {% for rota in rotas %}
                 <div style="background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                    <!--Exibe o status geral da rota usando o get_status_display -->
                     <h3>Rota #{{ rota.id }} - Status: {{ rota.get_status_display }}</h3>
+                    <!--Acessa os dados da loja através do relacionamento (Rota -> Loja) -->
                     <p><strong>Loja:</strong> {{ rota.loja.nome_fantasia }}</p>
                     
                     <ul style="list-style: none; padding: 0;">
+                        <!--RELACIONAMENTO REVERSO caso queira pegar todos os pedidos de uma rota específica
+                             'rota.entrega_set.all' pega todos os pedidos que estão dentro desta rota específica -->
                         {% for entrega in rota.entrega_set.all %}
                             <li style="border-top: 1px dashed #ccc; padding: 10px 0;">
                                 <strong>Destinatário:</strong> {{ entrega.destinatario }}<br>
                                 <strong>Endereço:</strong> {{ entrega.endereco_destino }}<br>
                                 <strong>Status:</strong> <span style="color: #e74c3c;">{{ entrega.get_status_display }}</span><br>
                                 
-                                <!-- Botões de Ação baseados no status da entrega -->
+                                <!-- AÇÕES INDIVIDUAIS DO ENTREGADOR   -->
+                                <!-- O botão que aparece depende do status do pedido -->                     
+                                <!-- Se o pedido já foi aceito, ele pode confirmar a coleta -->
                                 {% if entrega.status == 'ACEITA' %}
                                     <a href="{% url 'acao_entrega' entrega.id 'coletar' %}" style="display: inline-block; background-color: #f39c12; color: white; padding: 8px; border-radius: 4px; text-decoration: none; margin-top: 10px;">Confirmar Coleta</a>
+                                
+                                <!-- Se já foi coletado, ele pode confirmar a entrega-->
                                 {% elif entrega.status == 'COLETADA' %}
                                     <a href="{% url 'acao_entrega' entrega.id 'entregar' %}" style="display: inline-block; background-color: #2ecc71; color: white; padding: 8px; border-radius: 4px; text-decoration: none; margin-top: 10px;">Confirmar Entrega</a>
+                                
+                                <!--Se já foi entregue apenas mostra o checkcait verde -->
                                 {% elif entrega.status == 'ENTREGUE' %}
                                     <span style="color: green; font-weight: bold; display: block; margin-top: 10px;">✔ Entregue</span>
                                 {% endif %}
@@ -31,7 +42,7 @@
                 </div>
             {% endfor %}
         {% else %}
-            <p>Você não tem rotas ativas no momento.</p>
+            <p style="text-align: center; color: #888;">Você não tem rotas ativas no momento.</p>
         {% endif %}
     </div>
 

@@ -7,30 +7,35 @@ from django.utils import timezone
 from .forms import EntregaForm
 from .models import Loja, Entrega, Rota, Entregador
 
+# AUTENTICAÇÃO E DASHBOARD
 #Tela de Cadastro de Usuário
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'app_entregas/cadastro.html'
 
-#Tela do Painel Dashboard
-@login_required
+#Painel Principal do (Dashboard)
+@login_required 
 def dashboard(request):
     is_loja = Loja.objects.filter(usuario=request.user).exists()
     is_entregador = Entregador.objects.filter(usuario=request.user).exists()
     return render(request, 'app_entregas/dashboard.html', {'is_loja': is_loja, 'is_entregador': is_entregador})
 
-#Tela de Cadastrar Pedido
+
+# FUNCIONALIDADES DA LOJA
+# RF 004   Cadastro de pedidos de entrega
 @login_required
 def cadastrar_pedido(request):
+    # SEGURANÇA Só permite cadastrar se o Admin já tiver criado o perfil de Loja
+    try:
+        loja = Loja.objects.get(usuario=request.user)
+    except Loja.DoesNotExist:
+        return redirect('dashboard') # Se não for loja volta pro painel
+
     if request.method == 'POST':
         form = EntregaForm(request.POST)
         if form.is_valid():
-            pedido = form.save(commit=False)
-            loja, created = Loja.objects.get_or_create(
-                usuario=request.user, 
-                defaults={'nome_fantasia': request.user.username, 'endereco_retirada': 'Endereço Padrão'}
-            )
+            pedido = form.save(commit=False) 
             pedido.loja = loja
             pedido.save()
             return redirect('dashboard')
@@ -38,17 +43,17 @@ def cadastrar_pedido(request):
         form = EntregaForm()
     return render(request, 'app_entregas/cadastrar_pedido.html', {'form': form})
 
-#tela de Listar Pedidos 
+# RF 012 Acompanhamento de pedidos da Loja
 @login_required
 def listar_pedidos(request):
     try:
         loja = Loja.objects.get(usuario=request.user)
         pedidos = Entrega.objects.filter(loja=loja).order_by('-data_solicitacao')
     except Loja.DoesNotExist:
-        pedidos = []
+        pedidos = [] 
     return render(request, 'app_entregas/listar_pedidos.html', {'pedidos': pedidos})
 
-#Ação de Cancelar Pedido
+# RF 013  Cancelamento de pedido
 @login_required
 def cancelar_pedido(request, entrega_id):
     pedido = get_object_or_404(Entrega, id=entrega_id, loja__usuario=request.user)
@@ -70,7 +75,7 @@ def cancelar_pedido(request, entrega_id):
             
     return redirect('listar_pedidos')
 
-#Ação de Criar Rota Agrupada
+# RF 005 e RF 006  Criação manual de rotas agrupadas
 @login_required
 def criar_rota(request):
     try:
@@ -87,7 +92,7 @@ def criar_rota(request):
             pedido.save()
     return redirect('listar_pedidos')
 
-#Ação de Criar Rota Individual 
+# Criar Rota Individual (Pedido Enviar Sozinho)
 @login_required
 def criar_rota_individual(request, entrega_id):
     pedido = get_object_or_404(Entrega, id=entrega_id, loja__usuario=request.user)
@@ -98,21 +103,26 @@ def criar_rota_individual(request, entrega_id):
         pedido.save()
     return redirect('listar_pedidos')
 
-#Tela de Rotas Disponíveis
+# FUNCIONALIDADES DO ENTREGADOR
+# RF 007 Consulta de rotas disponíveis
 @login_required
 def listar_rotas(request):
+    # Mesmo sem perfil o usuário pode ver as rotas mas não poderá aceitar sem ser aprovado
     rotas = Rota.objects.filter(status='DISPONIVEL')
     return render(request, 'app_entregas/rotas_disponiveis.html', {'rotas': rotas})
 
-#Ação de Aceitar Rota
+# RF 008 e RF 009 Aceite de rota protegido por perfil de Admin
 @login_required
 def aceitar_rota(request, rota_id):
     rota = get_object_or_404(Rota, id=rota_id)
     
-    entregador, created = Entregador.objects.get_or_create(
-        usuario=request.user, defaults={'veiculo': 'Não informado', 'disponivel': True}
-    )
+    # SEGURANÇA Verifica se o Admin já criou o perfil de Entregador para este usuário
+    try:
+        entregador = Entregador.objects.get(usuario=request.user)
+    except Entregador.DoesNotExist:
+        return redirect('dashboard') #Se não for entregador aprovado bloqueia
     
+    # RN 010 Verifica se o entregador já está ocupado com outra rota
     tem_rota_ativa = Rota.objects.filter(entregador=entregador, status__in=['ACEITA', 'EM_ANDAMENTO']).exists()
     
     if not entregador.disponivel or tem_rota_ativa:
@@ -123,7 +133,9 @@ def aceitar_rota(request, rota_id):
         rota.status = 'ACEITA'
         rota.data_aceite = timezone.now()
         rota.save()
-        # O entregador fica indisponível ao aceitar uma rota
+        
+        #o entregador fica automaticamente indisponível quando aceita uma rota, para evitar 
+        # aceitar mais de uma rota ao mesmo tempo
         entregador.disponivel = False
         entregador.save()
         
@@ -133,14 +145,14 @@ def aceitar_rota(request, rota_id):
             
     return redirect('listar_rotas')
 
-#Tela de Minhas Rotas Ativas
+# Tela de Rotas Ativas do Entregador
 @login_required
 def minhas_rotas(request):
     entregador = Entregador.objects.filter(usuario=request.user).first()
     rotas = Rota.objects.filter(entregador=entregador).exclude(status='CONCLUIDA').order_by('-data_criacao') if entregador else []
     return render(request, 'app_entregas/minhas_rotas.html', {'rotas': rotas})
 
-#Ação de Coletar 
+# RF 010 e RF 011 Confirmação de coleta e entrega
 @login_required
 def acao_entrega(request, entrega_id, acao):
     pedido = get_object_or_404(Entrega, id=entrega_id, rota__entregador__usuario=request.user)
@@ -162,7 +174,7 @@ def acao_entrega(request, entrega_id, acao):
         if todos_entregues:
             pedido.rota.status = 'CONCLUIDA'
             pedido.rota.save()
-             # Libera o entregador para novas rotas
+            
             entregador = pedido.rota.entregador
             if entregador:
                 entregador.disponivel = True
@@ -170,19 +182,19 @@ def acao_entrega(request, entrega_id, acao):
             
     return redirect('minhas_rotas')
 
-#Ação de Alternar Disponibilidade
+# RF 009 Alternar disponibilidade para que o entregador possa aceitar novas rotas 
 @login_required
 def alternar_disponibilidade(request):
     entregador = Entregador.objects.filter(usuario=request.user).first()
     if entregador:
-        # Não deixa ficar disponível se estiver com rota em andamento
         tem_rota_ativa = Rota.objects.filter(entregador=entregador, status__in=['ACEITA', 'EM_ANDAMENTO']).exists()
         if not tem_rota_ativa:
             entregador.disponivel = not entregador.disponivel
             entregador.save()
     return redirect('dashboard')
 
-#Histórico da Loja
+# HISTÓRICOS
+# RF 014 Histórico de entregas da Loja
 @login_required
 def historico_loja(request):
     try:
@@ -192,7 +204,7 @@ def historico_loja(request):
         entregas_concluidas = []
     return render(request, 'app_entregas/historico_loja.html', {'entregas': entregas_concluidas})
 
-#Histórico do Entregador
+# RF 015 Histórico de rotas do Entregador
 @login_required
 def historico_entregador(request):
     entregador = Entregador.objects.filter(usuario=request.user).first()
@@ -201,7 +213,8 @@ def historico_entregador(request):
     else:
         rotas_concluidas = []
     return render(request, 'app_entregas/historico_entregador.html', {'rotas': rotas_concluidas})
-# Botão de Reset para Testes
+
+# Botão Utilitário de Teste será removido nas próximas versões, mas é útil para resetar o banco de dados durante os testes
 @login_required
 def resetar_teste(request):
     Entrega.objects.all().update(rota=None, status='PENDENTE_ROTA', data_coleta=None, data_entrega=None, data_cancelamento=None)

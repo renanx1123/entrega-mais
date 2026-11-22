@@ -1,18 +1,31 @@
 {% extends 'app_entregas/base.html' %}
+
 {% block content %}
     <h2>Histórico de Rotas (Entregador)</h2>
+    
     <div style="margin-top: 20px;">
+        <!-- Verifica se existem rotas concluídas para exibir Se caso a lista estiver
+          vazia mostra a mensagem -->
         {% if rotas %}
+            <!--Loop de repetição do Django  Para cada rota na lista de rotas
+             cria um cartão -->
             {% for rota in rotas %}
                 <div style="background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px;">
-                    <strong>Rota #{{ rota.id }}</strong> - <span style="color: #2ecc71; font-weight: bold;">Concluída</span><br>
+                    <strong>Rota #{{ rota.id }}</strong> - 
+                    <span style="color: #2ecc71; font-weight: bold;">Concluída</span><br>
+                    
+<!--Acessa o relacionamento de chave estrangeira para pegar o nome da loja (Rota - > Loja)-->
                     <strong>Loja:</strong> {{ rota.loja.nome_fantasia }}<br>
+                    
+                    <!--Filtro de data do Django Formata a data do banco (YYYY-MM-DD) para 
+                    o padrão brasileiro aqui é br (DD/MM/AAAA HH:MM) -->
                     <small style="color: #888;">Data: {{ rota.data_criacao|date:"d/m/Y H:i" }}</small>
                 </div>
             {% endfor %}
         {% else %}
-            <p>Nenhuma rota concluída no momento.</p>
+            <p style="text-align: center; color: #888;">Nenhuma rota concluída no momento.</p>
         {% endif %}
     </div>
+    
     <a href="{% url 'dashboard' %}" class="link" style="margin-top: 20px; display: block;">Voltar para o Painel</a>
 {% endblock %}

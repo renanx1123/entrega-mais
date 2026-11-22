@@ -4,7 +4,7 @@
     <h2>Bem-vindo ao Painel!</h2>
     <p style="text-align: center; margin-bottom: 30px;">Olá, {{ user.username }}! O que você deseja fazer hoje?</p>
     
-<!--ÁREA DO ENTREGADOR -->
+    <!-- SEÇÃO: CONTROLE DE DISPONIBILIDADE do entregador-->
     {% if is_entregador %}
         <div style="background: #ecf0f1; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
             <p style="margin-bottom: 10px;">Seu status atual: 
@@ -24,7 +24,7 @@
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
         
-<!-- AREA DA LOJA -->
+        <!-- ÁREA EXCLUSIVA DA LOJA-->
         {% if is_loja %}
             <a href="{% url 'cadastrar_pedido' %}" style="text-decoration: none;">
                 <button style="background-color: #3498db; height: 100px;">+ Novo Pedido</button>
@@ -37,7 +37,7 @@
             </a>
         {% endif %}
 
-<!-- AREA DO ENTREGADOR -->
+        <!-- ÁREA EXCLUSIVA DO ENTREGADOR-->
         {% if is_entregador %}
             <a href="{% url 'listar_rotas' %}" style="text-decoration: none;">
                 <button style="background-color: #e74c3c; height: 100px;">Buscar Rotas</button>
@@ -50,17 +50,18 @@
             </a>
         {% endif %}
 
-<!-- Se a pessoa não tiver perfil ainda -->
+        <!-- TRATAMENTO DE NOVO USUÁRIO AGUARDANDO ADMIN somente o admin pode ir
+         e modificar o perfil da conta pra entregador ou para loja -->
         {% if not is_loja and not is_entregador %}
-            <div style="background-color: #f8d7da; padding: 15px; border-radius: 5px; border: 1px solid #f5c6cb; grid-column: 1 / -1; text-align: center;">
-                <p style="color: #721c24; margin-bottom: 10px;">Você ainda não tem um perfil configurado.</p>
-                <a href="{% url 'listar_rotas' %}" style="text-decoration: none;">
-                    <button style="background-color: #e74c3c; width: 50%;">Aceitar minha primeira rota</button>
-                </a>
+            <div style="background-color: #fff3cd; padding: 20px; border-radius: 5px; border: 1px solid #ffeeba; grid-column: 1 / -1; text-align: center;">
+                <h3 style="color: #856404; margin-bottom: 10px;">⏳ Conta em Análise</h3>
+                <p style="color: #856404; margin-bottom: 10px;">Seu cadastro foi recebido, mas você ainda não tem um perfil ativo.</p>
+                <p style="color: #856404; font-size: 14px;">Por favor, aguarde o <strong>Administrador</strong> configurar sua conta como <strong>Loja</strong> ou <strong>Entregador</strong> no painel do sistema.</p>
             </div>
         {% endif %}
     </div>
 
+    <!-- Botão Utilitário apenas para testes será removido nas proximas atualizações -->
     <div style="text-align: center; margin-top: 40px;">
         <a href="{% url 'resetar_teste' %}" style="text-decoration: none;">
             <button style="background-color: #555; font-size: 12px; width: auto; padding: 8px 15px;">🔄 Resetar Banco de Testes</button>

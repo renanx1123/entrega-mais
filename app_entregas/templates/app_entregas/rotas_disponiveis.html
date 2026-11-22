@@ -4,20 +4,28 @@
     <h2>Rotas Disponíveis</h2>
     
     <div style="margin-top: 20px;">
+        <!-- Verifica se existem rotas esperando um entregador -->
         {% if rotas %}
             <ul style="list-style: none; padding: 0;">
+            <!--Loop para criar um cartão para cada rota disponível para o entregador -->
             {% for rota in rotas %}
                 <li style="background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px;">
                     <strong>Rota #{{ rota.id }}</strong><br>
+                    <!-- Puxa o nome da loja dona da rota -->
                     <strong>Loja:</strong> {{ rota.loja.nome_fantasia }}<br>
                     <strong>Pedidos:</strong> 
+                    
                     <ul>
+                        <!--RELACIONAMENTO REVERSO  Pega todos os pedidos que estão dentro desta rota -->
                         {% for entrega in rota.entrega_set.all %}
                             <li>{{ entrega.destinatario }} - {{ entrega.endereco_destino }}</li>
                         {% endfor %}
                     </ul>
                     
-                   
+                    <!--BOTÃO DE ACEITE  Nós usamos a tag <a> (link) e estilizamos com CSS (display: block) 
+                        para que ela ocupe a largura toda e pareça um botão clicável logicamente
+                        Isso é uma boa prática de acessibilidade evitando os queridos conflitos do HTML 
+                        ao colocar um <button> dentro de um <a> -->
                     <a href="{% url 'aceitar_rota' rota.id %}" style="display: block; text-align: center; background-color: #e74c3c; color: white; padding: 10px; border-radius: 4px; text-decoration: none; margin-top: 15px; font-weight: bold;">
                         Aceitar Rota
                     </a>
@@ -25,7 +33,7 @@
             {% endfor %}
             </ul>
         {% else %}
-            <p>Nenhuma rota disponível no momento.</p>
+            <p style="text-align: center; color: #888;">Nenhuma rota disponível no momento.</p>
         {% endif %}
     </div>
 

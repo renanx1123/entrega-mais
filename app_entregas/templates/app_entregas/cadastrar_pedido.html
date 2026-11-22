@@ -1,13 +1,29 @@
+<!-- essa é Herança de Template Puxa todo o cabeçalho e CSS do arquivo base.html
+ ajuda a deixar o código mais organizado e reutilizável -->
 {% extends 'app_entregas/base.html' %}
 
 {% block content %}
     <h2>Novo Pedido de Entrega</h2>
     
+    <!-- Formulário que envia os dados via método POST para a
+      View cadastrar_pedido  -->
     <form method="post">
+        
+        <!-- SEGURANÇA  O csrf_token gera uma chave criptografada oculta
+             Ele impede ataques de CSRF  garantindo que 
+             o formulário foi enviado pelo próprio site e não por um site malicioso-->
         {% csrf_token %}
+        
+        <!-- RENDERIZAÇÃO  O form.as_p pega todos os campos do forms.py 
+             destinatário, endereço, telefone e os renderiza em parágrafos
+             Se a gente quiser adicionar um campo novo no futuro não precisamos 
+             mudar esse HTML apenas o arquivo forms.py tem margem pra upgrades futuros -->
         {{ form.as_p }}
+        
         <button type="submit" style="margin-top: 15px;">Salvar Pedido</button>
     </form>
 
+    <!-- Usamos a tag {% url %} para gerar o link dinamicamente 
+     sem precisar digitar a URL na mão -->
     <a href="{% url 'dashboard' %}" class="link">Voltar para o Painel</a>
 {% endblock %}

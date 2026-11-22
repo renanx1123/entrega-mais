@@ -1,13 +1,24 @@
+<!-- Herança de Template novamente 
+ Reaproveita o cabeçalho o CSS e o layout do base.html -->
 {% extends 'app_entregas/base.html' %}
 
 {% block content %}
     <h2>Crie sua conta</h2>
     
+    <!-- Formulário de cadastro público  -->
     <form method="post">
+        <!-- Segurança Proteção contra ataques CSRF -->
         {% csrf_token %}
+        
+        <!-- Renderização dos campos o Django puxa o UserCreationForm padrão 
+             Usuário, Senha e Confirmação de Senha ou seja ele não pede o email do usuário
+                O UserCreationForm é um formulário padrão do Django para criar novos usuários.
+             O '.as_p' formata os campos em parágrafos mais bonitos-->
         {{ form.as_p }}
+        
         <button type="submit">Cadastrar</button>
     </form>
 
+    <!-- nosso Link dinâmico usando a tag 'url' para voltar à tela de login -->
     <a href="{% url 'login' %}" class="link">Já tem uma conta? Faça login</a>
 {% endblock %}

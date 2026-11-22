@@ -3,11 +3,18 @@
 {% block content %}
     <h2>Entre na sua conta</h2>
     
+    <!--Formulário de Login-->
     <form method="post">
+        <!--SegurançaProteção nativa do Django contra CSRF proteção em primeito lugar-->
         {% csrf_token %}
+        
+        <!-- O Django pega o AuthenticationForm padrão Usuário e Senha
+             e renderiza os campos automaticamente aqui -->
         {{ form.as_p }}
+        
         <button type="submit">Entrar</button>
     </form>
 
+    <!-- Link  para a tela de cadastro, caso o usuário não tenha conta-->
     <a href="{% url 'cadastro' %}" class="link">Não tem uma conta? Cadastre-se</a>
 {% endblock %}
