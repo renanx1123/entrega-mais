@@ -36,9 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app_entregas', # <-- Nosso sistema de entregas
+    'app_entregas',
+    'rest_framework',    
+    'drf_spectacular',    
 ]
-
 # MIDDLEWARES: Camadas de segurança e processamento que cada requisição passa.
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -124,3 +125,13 @@ CSRF_TRUSTED_ORIGINS = [
 # Como o plano free do Render às vezes redireciona ou testamos em HTTP local, mantemos False para evitar problemas de cookies
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Entrega+ API',
+    'DESCRIPTION': 'API para o Sistema de Gerenciamento de Entregas',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
